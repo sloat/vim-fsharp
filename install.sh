@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if ! [ -e ./packages/FAKE/tools/Fake.exe ]
 then
     mono paket.bootstrapper.exe

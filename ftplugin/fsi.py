@@ -1,9 +1,13 @@
+from __future__ import print_function
 from subprocess import Popen, PIPE
 from os import path
 import string
 import threading
 import tempfile
-import Queue
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 import uuid
 import hidewin
 
@@ -39,7 +43,7 @@ class FSharpInteractive:
             self.logfile.flush()
 
     def shutdown(self):
-        print "shutting down fsi"
+        print("shutting down fsi")
         self._should_work = False
         self.p.kill()
 
@@ -97,7 +101,7 @@ class FSharpInteractive:
                 self.lines.put(l, True)
                 self._log(l)
             except Exception as ex:
-                print ex
+                print(ex)
 
     def _err_work(self):
         while(self._should_work):
