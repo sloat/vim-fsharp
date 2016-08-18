@@ -19,9 +19,17 @@ endif
 let s:cpo_save = &cpo
 set cpo&vim
 
-" check for python support
 if has('python')
-    python <<EOF
+    command! -nargs=1 Python python <args>
+elseif has('python3')
+    command! -nargs=1 Python python3 <args>
+else
+    echo "Error: Requires Vim compiled with +python or +python3"
+    finish
+endif
+" check for python support
+Python <<EOF
+
 import vim
 import os
 import re
@@ -63,87 +71,87 @@ if '.fs' == ext or '.fsi' == ext:
         G.fsac.project(proj_file)
 G.fsac.parse(b.name, True, b)
 EOF
-    if !exists('g:fsharp_map_keys')
-        let g:fsharp_map_keys = 1
-    endif
 
-    if !exists('g:fsharp_map_prefix')
-        let g:fsharp_map_prefix = '<leader>'
-    endif
-
-    if !exists('g:fsharp_map_typecheck')
-        let g:fsharp_map_typecheck = 't'
-    endif
-
-    if !exists('g:fsharp_map_gotodecl')
-        let g:fsharp_map_gotodecl = 'd'
-    endif
-
-    if !exists('g:fsharp_map_gobackfromdecl')
-        let g:fsharp_map_gobackfromdecl = 's'
-    endif
-
-    if !exists('g:fsharp_map_fsiinput')
-        let g:fsharp_map_fsiinput = 'e'
-    endif
-
-    if g:fsharp_map_keys
-        execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_typecheck  ":call fsharpbinding#python#TypeCheck()<CR>"
-        execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_gotodecl  ":call fsharpbinding#python#GotoDecl()<CR>"
-        execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_gobackfromdecl  ":call fsharpbinding#python#GoBackFromDecl()<CR>"
-        execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_fsiinput  ":call fsharpbinding#python#FsiInput()<CR>"
-    endif
-
-    com! -buffer FSharpLogFile call fsharpbinding#python#LoadLogFile()
-    com! -buffer FSharpToggleHelptext call fsharpbinding#python#ToggleHelptext()
-    com! -buffer -nargs=* -complete=file FSharpParseProject call fsharpbinding#python#ParseProject(<f-args>)
-    com! -buffer -nargs=* -complete=file FSharpBuildProject call fsharpbinding#python#BuildProject(<f-args>)
-    com! -buffer -nargs=* -complete=file FSharpRunTests call fsharpbinding#python#RunTests(<f-args>)
-    com! -buffer -nargs=* -complete=file FSharpRunProject call fsharpbinding#python#RunProject(<f-args>)
-
-    "fsi
-    com! -buffer FsiShow call fsharpbinding#python#FsiShow()
-    com! -buffer FsiClear call fsharpbinding#python#FsiClear()
-    com! -buffer FsiRead call fsharpbinding#python#FsiRead(0.5) "short timeout as there may not be anything to read
-    com! -buffer FsiReset call fsharpbinding#python#FsiReset(g:fsharp_interactive_bin)
-    com! -buffer -nargs=1 FsiEval call fsharpbinding#python#FsiEval(<q-args>)
-    com! -buffer FsiEvalBuffer call fsharpbinding#python#FsiSendAll()
-
-    if !exists('g:fsharp_map_fsisendline')
-        let g:fsharp_map_fsisendline = 'i'
-    endif
-
-    if !exists('g:fsharp_map_fsisendsel')
-        let g:fsharp_map_fsisendsel = 'i'
-    endif
-
-    if g:fsharp_map_keys
-        nnoremap  :<C-u>call fsharpbinding#python#FsiSendLine()<cr>
-        vnoremap  :<C-u>call fsharpbinding#python#FsiSendSel()<cr>
-
-        execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_fsisendline  ":call fsharpbinding#python#FsiSendLine()<CR>"
-        execute "vnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_fsisendsel  ":call fsharpbinding#python#FsiSendSel()<CR>"
-    endif
-
-    augroup fsharpbindings_au
-        au!
-        " closing the scratch window after leaving insert mode
-        " is common practice
-        au BufWritePre  *.fs,*.fsi,*fsx call fsharpbinding#python#OnBufWritePre()
-        if version > 703
-            " these events new in Vim 7.4
-            au TextChanged  *.fs,*.fsi,*fsx call fsharpbinding#python#OnTextChanged()
-            au TextChangedI *.fs,*.fsi,*fsx call fsharpbinding#python#OnTextChangedI()
-            au CursorHold   *.fs,*.fsi,*fsx call fsharpbinding#python#OnCursorHold()
-            au InsertLeave  *.fs,*.fsi,*fsx call fsharpbinding#python#OnInsertLeave()
-        endif
-        au BufEnter     *.fs,*.fsi,*fsx call fsharpbinding#python#OnBufEnter()
-        au InsertLeave  *.fs,*.fsi,*fsx  if pumvisible() == 0|silent! pclose|endif
-    augroup END
-
-    " omnicomplete
-    setlocal omnifunc=fsharpbinding#python#Complete
+if !exists('g:fsharp_map_keys')
+    let g:fsharp_map_keys = 1
 endif
+
+if !exists('g:fsharp_map_prefix')
+    let g:fsharp_map_prefix = '<leader>'
+endif
+
+if !exists('g:fsharp_map_typecheck')
+    let g:fsharp_map_typecheck = 't'
+endif
+
+if !exists('g:fsharp_map_gotodecl')
+    let g:fsharp_map_gotodecl = 'd'
+endif
+
+if !exists('g:fsharp_map_gobackfromdecl')
+    let g:fsharp_map_gobackfromdecl = 's'
+endif
+
+if !exists('g:fsharp_map_fsiinput')
+    let g:fsharp_map_fsiinput = 'e'
+endif
+
+if g:fsharp_map_keys
+    execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_typecheck  ":call fsharpbinding#python#TypeCheck()<CR>"
+    execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_gotodecl  ":call fsharpbinding#python#GotoDecl()<CR>"
+    execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_gobackfromdecl  ":call fsharpbinding#python#GoBackFromDecl()<CR>"
+    execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_fsiinput  ":call fsharpbinding#python#FsiInput()<CR>"
+endif
+
+com! -buffer FSharpLogFile call fsharpbinding#python#LoadLogFile()
+com! -buffer FSharpToggleHelptext call fsharpbinding#python#ToggleHelptext()
+com! -buffer -nargs=* -complete=file FSharpParseProject call fsharpbinding#python#ParseProject(<f-args>)
+com! -buffer -nargs=* -complete=file FSharpBuildProject call fsharpbinding#python#BuildProject(<f-args>)
+com! -buffer -nargs=* -complete=file FSharpRunTests call fsharpbinding#python#RunTests(<f-args>)
+com! -buffer -nargs=* -complete=file FSharpRunProject call fsharpbinding#python#RunProject(<f-args>)
+
+"fsi
+com! -buffer FsiShow call fsharpbinding#python#FsiShow()
+com! -buffer FsiClear call fsharpbinding#python#FsiClear()
+com! -buffer FsiRead call fsharpbinding#python#FsiRead(0.5) "short timeout as there may not be anything to read
+com! -buffer FsiReset call fsharpbinding#python#FsiReset(g:fsharp_interactive_bin)
+com! -buffer -nargs=1 FsiEval call fsharpbinding#python#FsiEval(<q-args>)
+com! -buffer FsiEvalBuffer call fsharpbinding#python#FsiSendAll()
+
+if !exists('g:fsharp_map_fsisendline')
+    let g:fsharp_map_fsisendline = 'i'
+endif
+
+if !exists('g:fsharp_map_fsisendsel')
+    let g:fsharp_map_fsisendsel = 'i'
+endif
+
+if g:fsharp_map_keys
+    nnoremap  :<C-u>call fsharpbinding#python#FsiSendLine()<cr>
+    vnoremap  :<C-u>call fsharpbinding#python#FsiSendSel()<cr>
+
+    execute "nnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_fsisendline  ":call fsharpbinding#python#FsiSendLine()<CR>"
+    execute "vnoremap <buffer>" g:fsharp_map_prefix.g:fsharp_map_fsisendsel  ":call fsharpbinding#python#FsiSendSel()<CR>"
+endif
+
+augroup fsharpbindings_au
+    au!
+    " closing the scratch window after leaving insert mode
+    " is common practice
+    au BufWritePre  *.fs,*.fsi,*fsx call fsharpbinding#python#OnBufWritePre()
+    if version > 703
+        " these events new in Vim 7.4
+        au TextChanged  *.fs,*.fsi,*fsx call fsharpbinding#python#OnTextChanged()
+        au TextChangedI *.fs,*.fsi,*fsx call fsharpbinding#python#OnTextChangedI()
+        au CursorHold   *.fs,*.fsi,*fsx call fsharpbinding#python#OnCursorHold()
+        au InsertLeave  *.fs,*.fsi,*fsx call fsharpbinding#python#OnInsertLeave()
+    endif
+    au BufEnter     *.fs,*.fsi,*fsx call fsharpbinding#python#OnBufEnter()
+    au InsertLeave  *.fs,*.fsi,*fsx  if pumvisible() == 0|silent! pclose|endif
+augroup END
+
+" omnicomplete
+setlocal omnifunc=fsharpbinding#python#Complete
 
 " enable syntax based folding
 setl fdm=syntax

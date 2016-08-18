@@ -40,7 +40,7 @@ function s:pyeval(expr)
     if version > 703
         return pyeval(a:expr)
     endif
-python << EOF
+Python << EOF
 import json
 arg = vim.eval('a:expr')
 result = json.dumps(eval(arg))
@@ -50,7 +50,7 @@ endfunction
 
 
 function! fsharpbinding#python#LoadLogFile()
-python << EOF
+Python << EOF
 print G.fsac.logfiledir
 EOF
 endfunction
@@ -59,11 +59,11 @@ endfunction
 function! fsharpbinding#python#ParseProject(...)
     execute 'wa'
     if a:0 > 0
-    python << EOF
+    Python << EOF
 G.fsac.project(vim.eval("a:1"))
 EOF
     elseif exists('b:proj_file')
-    python << EOF
+    Python << EOF
 G.fsac.project(vim.eval("b:proj_file"))
 EOF
     endif
@@ -124,7 +124,7 @@ function! fsharpbinding#python#RunTests(...)
 endfunction
 
 function! fsharpbinding#python#TypeCheck()
-    python << EOF
+    Python << EOF
 b = vim.current.buffer
 G.fsac.parse(b.name, True, b)
 row, col = vim.current.window.cursor
@@ -202,7 +202,7 @@ function! fsharpbinding#python#Complete(findstart, base)
         return idx
     else
 
-    python << EOF
+    Python << EOF
 b = vim.current.buffer
 row, col = vim.current.window.cursor
 line = b[row - 1]
@@ -231,7 +231,7 @@ endfunction
 
 
 function! fsharpbinding#python#GoBackFromDecl()
-    python << EOF
+    Python << EOF
 b = vim.current.buffer
 w = vim.current.window
 try:
@@ -248,7 +248,7 @@ endfunction
 
 
 function! fsharpbinding#python#GotoDecl()
-    python << EOF
+    Python << EOF
 b = vim.current.buffer
 w = vim.current.window
 G.fsac.parse(b.name, True, b)
@@ -269,7 +269,7 @@ endfunction
 
 function! fsharpbinding#python#OnBufWritePre()
     "ensure a parse has been requested before BufWritePost is called
-    python << EOF
+    Python << EOF
 G.fsac.parse(vim.current.buffer.name, True, vim.current.buffer)
 EOF
     let b:fsharp_buffer_changed = 0
@@ -278,7 +278,7 @@ endfunction
 function! fsharpbinding#python#OnInsertLeave()
     if exists ("b:fsharp_buffer_changed") != 0
         if b:fsharp_buffer_changed == 1
-    python << EOF
+    Python << EOF
 G.fsac.parse(vim.current.buffer.name, True, vim.current.buffer)
 EOF
         endif
@@ -298,7 +298,7 @@ endfunction
 function! fsharpbinding#python#OnTextChanged()
     let b:fsharp_buffer_changed = 1
     "TODO: make an parse_async that writes to the server on a background thread
-    python << EOF
+    Python << EOF
 G.fsac.parse(vim.current.buffer.name, True, vim.current.buffer)
 EOF
 endfunction
@@ -310,7 +310,7 @@ endfunction
 function! fsharpbinding#python#OnBufEnter()
     let b:fsharp_buffer_changed = 1
     set updatetime=500
-python << EOF
+Python << EOF
 G.fsac.parse(vim.current.buffer.name, True, vim.current.buffer)
 
 file_dir = vim.eval("expand('%:p:h')")
@@ -328,7 +328,7 @@ EOF
 endfunction
 
 function! fsharpbinding#python#FsiReset(fsi_path)
-    python << EOF
+    Python << EOF
 G.fsi.shutdown()
 G.fsi = FSharpInteractive(vim.eval('a:fsi_path'))
 G.fsi.cd(vim.eval("expand('%:p:h')"))
@@ -343,7 +343,7 @@ function! fsharpbinding#python#FsiInput()
 endfunction
 
 function! fsharpbinding#python#FsiSend(text)
-    python << EOF
+    Python << EOF
 path = vim.current.buffer.name
 (row, col) = vim.current.window.cursor
 G.fsi.set_loc(path, row)
@@ -368,7 +368,7 @@ function! fsharpbinding#python#FsiShow()
 endfunction
 
 function! fsharpbinding#python#FsiPurge()
-python << EOF
+Python << EOF
 lines = G.fsi.purge()
 for b in vim.buffers:
     if 'fsi-out' in b.name:
@@ -378,7 +378,7 @@ EOF
 endfunction
 
 function! fsharpbinding#python#FsiClear()
-python << EOF
+Python << EOF
 lines = G.fsi.purge()
 for b in vim.buffers:
     if 'fsi-out' in b.name:
@@ -387,7 +387,7 @@ for b in vim.buffers:
 EOF
 endfunction
 function! fsharpbinding#python#FsiRead(time_out)
-python << EOF
+Python << EOF
 lines = G.fsi.read_until_prompt(float(vim.eval('a:time_out')))
 for b in vim.buffers:
     if 'fsi-out' in b.name:
