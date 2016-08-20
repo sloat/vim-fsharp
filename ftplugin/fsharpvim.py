@@ -163,7 +163,7 @@ class FSAutoComplete:
             return []
 
         if base != '':
-            msg = filter(lambda(line):
+            msg = filter(lambda line:
                     line['Name'].lower().find(base.lower()) != -1, msg)
         msg.sort(key=lambda x: x['Name'].startswith(base), reverse=True)
 
@@ -234,7 +234,7 @@ class FSharpVimFixture(unittest.TestCase):
         self.fsac = FSAutoComplete('.')
         self.testscript = 'test/TestScript.fsx'
         with open(self.testscript, 'r') as content_file:
-            content = map(lambda(line): line.strip('\n'), list(content_file))
+            content = map(lambda line: line.strip('\n'), list(content_file))
 
         self.fsac.parse(self.testscript, True, content)
 

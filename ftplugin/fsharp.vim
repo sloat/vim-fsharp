@@ -27,6 +27,7 @@ else
     echo "Error: Requires Vim compiled with +python or +python3"
     finish
 endif
+
 " check for python support
 Python <<EOF
 
@@ -65,7 +66,7 @@ x,ext = os.path.splitext(b.name)
 if '.fs' == ext or '.fsi' == ext:
     dir = os.path.dirname(os.path.realpath(b.name))
     projs = filter(lambda f: '.fsproj' == os.path.splitext(f)[1], os.listdir(dir))
-    if len(projs):
+    if len(list(projs)):
         proj_file = os.path.join(dir, projs[0])
         vim.command("let b:proj_file = '%s'" % proj_file)
         G.fsac.project(proj_file)

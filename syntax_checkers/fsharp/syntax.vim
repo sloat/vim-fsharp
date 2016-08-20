@@ -7,7 +7,7 @@ set cpo&vim
 let g:loaded_syntastic_fsharp_syntax_checker = 1
 
 function! SyntaxCheckers_fsharp_syntax_IsAvailable() dict
-    return has('python')
+    return has('python') || has('python3')
 endfunction
 
 function! SyntaxCheckers_fsharp_syntax_GetLocList() dict
